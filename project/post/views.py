@@ -84,12 +84,6 @@ class CommentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.
         if self.action in ["update", "destroy", "partial_update"]:
             return [IsCommentOwnerOrReadOnly()]
         return []
-
-    # 부모 클래스의 get_object 메서드를 호출하여 요청된 객체를 가져오고 이를 반환
-    # 주로 객체를 조회하는 요청(예: retrieve, update, destroy 등)에서 호출
-    def get_object(self):
-        obj = super().get_object()
-        return obj
     
 # 게시물에 있는 댓글 목록 조회, 게시물에 댓글 작성
 class PostCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
