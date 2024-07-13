@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from .models import Post, Comment, Tag
 from .serializers import PostSerializer, PostListSerializer, CommentSerializer, TagSerializer
 from rest_framework.permissions import IsAuthenticated
-from .permissions import IsPostOwnerOrReadOnly, IsCommentOwnerOrReadOnly
+from .permissions import IsPostOwnerOrReadOnly, IsCommentOwnerOrReadOnly, IsPossibleCommentsOrReadOnly
 from rest_framework.exceptions import PermissionDenied
 
 from django.shortcuts import get_object_or_404
@@ -46,8 +46,8 @@ class PostViewSet(viewsets.ModelViewSet):
             movie.tag.add(tag)
         movie.save()
     
-    @action(methods=['GET'], detail=False, url_path="mingi")
-    def recommand(self, request):
+    @action(methods=['GET'], detail=False)
+    def recommend(self, request):
         ran_post = self.get_queryset().order_by('?').first()
         ran_post_serializer = PostSerializer(ran_post)
         return Response(ran_post_serializer.data)
@@ -89,11 +89,10 @@ class CommentViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.
 class PostCommentViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
     
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
         if self.action in ["create"]:
-            return [IsCommentOwnerOrReadOnly()]
+            return [IsPossibleCommentsOrReadOnly()]
         return []
     
     def get_queryset(self):
